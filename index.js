@@ -38,7 +38,17 @@ async function run() {
       .collection("availableFoodCollection");
 
     app.get("/availablefoods", async (req, res) => {
-      const result = await availableFoodCollection.find().toArray();
+      const { sort } = req.query;
+      let result = [];
+      if (sort) {
+        result = await availableFoodCollection
+          .find()
+          .sort({ expiredDateTime: 1 })
+          .toArray();
+        res.send(result);
+        return;
+      }
+      result = await availableFoodCollection.find().toArray();
       res.send(result);
     });
     app.get("/availablefoods/:id", async (req, res) => {
