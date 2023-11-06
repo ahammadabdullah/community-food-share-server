@@ -61,7 +61,7 @@ async function run() {
     });
     app.post("/request/food", async (req, res) => {
       const data = req.body;
-      const result = await availableFoodCollection.insertOne(data);
+      const result = await requestedFoodCollection.insertOne(data);
       res.send(result);
     });
   } finally {
