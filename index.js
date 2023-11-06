@@ -38,7 +38,6 @@ async function run() {
       .collection("availableFoodCollection");
 
     app.get("/availablefoods", async (req, res) => {
-      console.log("hitting");
       const result = await availableFoodCollection.find().toArray();
       res.send(result);
     });
