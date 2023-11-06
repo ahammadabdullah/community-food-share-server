@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.USER}:${process.env.PASS}@cluster0.h7hr6qr.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -39,6 +39,13 @@ async function run() {
 
     app.get("/availablefoods", async (req, res) => {
       const result = await availableFoodCollection.find().toArray();
+      res.send(result);
+    });
+    app.get("/availablefoods/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const query = { _id: new ObjectId(id) };
+      const result = await availableFoodCollection.findOne(query);
       res.send(result);
     });
   } finally {
