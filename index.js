@@ -69,6 +69,13 @@ async function run() {
       const result = await availableFoodCollection.insertOne(data);
       res.send(result);
     });
+    app.get("/requestedfood", async (req, res) => {
+      const email = req.query.email;
+      console.log(email);
+      const query = { userEmail: email };
+      const result = await requestedFoodCollection.find(query).toArray();
+      res.send(result);
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
