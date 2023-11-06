@@ -36,7 +36,9 @@ async function run() {
     const availableFoodCollection = client
       .db("community-food-service")
       .collection("availableFoodCollection");
-
+    const requestedFoodCollection = client
+      .db("community-food-service")
+      .collection("requestedFood");
     app.get("/availablefoods", async (req, res) => {
       const { sort } = req.query;
       let result = [];
@@ -53,9 +55,13 @@ async function run() {
     });
     app.get("/availablefoods/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
       const query = { _id: new ObjectId(id) };
       const result = await availableFoodCollection.findOne(query);
+      res.send(result);
+    });
+    app.post("/request/food", async (req, res) => {
+      const data = req.body;
+      const result = await availableFoodCollection.insertOne(data);
       res.send(result);
     });
   } finally {
