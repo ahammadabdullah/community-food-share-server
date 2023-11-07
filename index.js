@@ -1,14 +1,38 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 const port = process.env.PORT || 3500;
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    credentials: true,
+  })
+);
 app.use(express.json());
+app.use(cookieParser());
 
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.USER}:${process.env.PASS}@cluster0.h7hr6qr.mongodb.net/?retryWrites=true&w=majority`;
 
+const verifier = (req, res, next) => {
+  const token = req.cookies?.token;
+  if (!token) {
+    res.status(401).send({ message: "unauthorized access" });
+    return;
+  }
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ message: "Unauthorized Access" });
+    } else {
+      req.user = decoded;
+      console.log(decoded);
+      next();
+    }
+  });
+};
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -46,6 +70,30 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
+
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1h",
+      });
+      res
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        })
+        .send({ success: true });
+    });
+    app.post("/logout", async (req, res) => {
+      const user = req.body;
+      res
+        .clearCookie("token", {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        })
+        .send({ success: true });
+    });
 
     const availableFoodCollection = client
       .db("community-food-service")
