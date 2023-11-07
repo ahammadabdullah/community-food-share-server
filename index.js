@@ -23,6 +23,20 @@ app.get("/", async (req, res) => {
 app.listen(port, () => {
   console.log(`server is listening on ${port}`);
 });
+
+// {
+//     "_id": "65484c59b6454146f1868ba8",
+//     "foodImage": "https://cdn.discordapp.com/attachments/796439138403352596/1170901646067372092/635636837767888108-Pizza-crowd.png",
+//     "foodName": "Pizza",
+//     "donatorImage": "https://cdn.discordapp.com/attachments/796439138403352596/1170902707062718654/user-icon.png",
+//     "donatorName": "John Doe",
+//     "foodQuantity": 4,
+//     "pickupLocation": "123 Main Street, Anytown, CA 91234",
+//     "expiredDateTime": "2023-12-06",
+//     "additionalNotes": "This pizza is still hot and fresh!",
+//     "donerEmail": "doner@gmail.com",
+//     "status": "available"
+//   }
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -79,6 +93,27 @@ async function run() {
     app.post("/addfood", async (req, res) => {
       const data = req.body;
       const result = await availableFoodCollection.insertOne(data);
+      res.send(result);
+    });
+    app.put("/updatefood", async (req, res) => {
+      const id = req.query.id;
+      const data = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updatedFood = {
+        $set: {
+          foodImage: data.foodImage,
+          foodName: data.foodName,
+          donatorImage: data.donatorImage,
+          donatorName: data.donatorName,
+          foodQuantity: data.foodQuantity,
+          pickupLocation: data.pickupLocation,
+          expiredDateTime: data.expiredDateTime,
+          additionalNotes: data.additionalNotes,
+          donerEmail: data.donerEmail,
+          status: data.status,
+        },
+      };
+      result = await availableFoodCollection.updateOne(filter, updatedFood);
       res.send(result);
     });
     app.get("/requestedfood", async (req, res) => {
