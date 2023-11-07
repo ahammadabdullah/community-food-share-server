@@ -25,10 +25,10 @@ const verifier = (req, res, next) => {
   }
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
+      console.log(err);
       return res.status(401).send({ message: "Unauthorized Access" });
     } else {
       req.user = decoded;
-      console.log(decoded);
       next();
     }
   });
@@ -48,19 +48,6 @@ app.listen(port, () => {
   console.log(`server is listening on ${port}`);
 });
 
-// {
-//     "_id": "65484c59b6454146f1868ba8",
-//     "foodImage": "https://cdn.discordapp.com/attachments/796439138403352596/1170901646067372092/635636837767888108-Pizza-crowd.png",
-//     "foodName": "Pizza",
-//     "donatorImage": "https://cdn.discordapp.com/attachments/796439138403352596/1170902707062718654/user-icon.png",
-//     "donatorName": "John Doe",
-//     "foodQuantity": 4,
-//     "pickupLocation": "123 Main Street, Anytown, CA 91234",
-//     "expiredDateTime": "2023-12-06",
-//     "additionalNotes": "This pizza is still hot and fresh!",
-//     "donerEmail": "doner@gmail.com",
-//     "status": "available"
-//   }
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -85,7 +72,6 @@ async function run() {
         .send({ success: true });
     });
     app.post("/logout", async (req, res) => {
-      const user = req.body;
       res
         .clearCookie("token", {
           httpOnly: true,
@@ -115,7 +101,7 @@ async function run() {
       result = await availableFoodCollection.find().toArray();
       res.send(result);
     });
-    app.get("/myfoods", async (req, res) => {
+    app.get("/myfoods", verifier, async (req, res) => {
       const email = req.query.email;
       const query = { donerEmail: email };
       const result = await availableFoodCollection.find(query).toArray();
@@ -164,7 +150,7 @@ async function run() {
       result = await availableFoodCollection.updateOne(filter, updatedFood);
       res.send(result);
     });
-    app.get("/requestedfood", async (req, res) => {
+    app.get("/requestedfood", verifier, async (req, res) => {
       const email = req.query.email;
       console.log(email);
       const query = { userEmail: email };
