@@ -139,16 +139,21 @@ async function run() {
       const id = req.params.id;
       console.log(id);
       const data = req.body;
-      const filter = { _id: new ObjectId(id) };
+      const filter = { uid: id };
       const updatedData = {
         $set: {
           status: data.status,
         },
       };
+      const priResult = await availableFoodCollection.updateOne(
+        filter,
+        updatedData
+      );
       const result = await requestedFoodCollection.updateOne(
         filter,
         updatedData
       );
+
       res.send(result);
     });
   } finally {
