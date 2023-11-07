@@ -129,6 +129,12 @@ async function run() {
       const result = await requestedFoodCollection.deleteOne(query);
       res.send(result);
     });
+    app.get("/managerequest", async (req, res) => {
+      const foodName = req.query.foodName;
+      const query = { foodName: foodName };
+      const result = await requestedFoodCollection.find(query).toArray();
+      res.send(result);
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
