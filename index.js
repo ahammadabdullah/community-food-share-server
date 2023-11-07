@@ -135,6 +135,22 @@ async function run() {
       const result = await requestedFoodCollection.find(query).toArray();
       res.send(result);
     });
+    app.put("/requestedfood/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const data = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updatedData = {
+        $set: {
+          status: data.status,
+        },
+      };
+      const result = await requestedFoodCollection.updateOne(
+        filter,
+        updatedData
+      );
+      res.send(result);
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
