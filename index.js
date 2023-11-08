@@ -8,7 +8,11 @@ const port = process.env.PORT || 3500;
 const app = express();
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      "https://community-food-share.web.app",
+      "https://community-food-share.firebaseapp.com",
+    ],
     credentials: true,
   })
 );
